@@ -2,7 +2,7 @@ import os
 import re
 import tensorflow as tf
 import datasets
-from datasets import load_dataset, Dataset, DatasetDict
+from datasets import load_dataset, Dataset, DatasetDict, Features, Value
 import keras
 import pandas as pd
 import random
@@ -120,11 +120,50 @@ dataset_train = Dataset.from_pandas(pd.DataFrame({"train_text": text_list_train}
 
 # Ou Créer un dictionnaire et utiliser la fonction from_dict(), la clé est le nom de la colonne
 print(len(text_list_train))
-dataset_train = Dataset.from_dict({"train_text": text_list_train})
+features = Features({'text' : Value(dtype='string')})
+dataset_train = Dataset.from_dict({"text": text_list_train}, features)
+
 print(dataset_train.shape)
 
 # On fait pareil pour le dataset de test
-dataset_test = Dataset.from_dict({"test_text": text_list_test})
+dataset_test = Dataset.from_dict({"text": text_list_test}, features)
 
 dataset = DatasetDict({"train": dataset_train, "test": dataset_test})
-print(dataset.num_rows)
+print(dataset)
+
+# On est revenus à l'état initial mais en ayant modifié nos données
+# On peut adapter les modifications selon le niveau de traitement (répartition statistique, découpage spécial)
+
+# EXEMPLE A RAJOUTER DANS LA CLASSE DATASET PREPPER #
+def compute_sentence_length(example):
+    return {"sentence_length": len(example["text"].split())}
+
+dataset_new_col_train= dataset['train'].map(compute_sentence_length)
+print(dataset_new_col_train[0]) # new column added
+
+# Certaines phrases ont trop peu de mots
+print(dataset_new_col_train.sort("sentence_length")[:3])
+# ON retire les phrases qui ont une taille <= 3 mots
+
+dataset_new_col_train = dataset_new_col_train.filter(lambda x: x["sentence_length"] > 3)
+print(dataset_new_col_train.num_rows)
+
+# On fait pareil pour le dataset de validation
+
+dataset_new_col_test = dataset['test'].map(compute_sentence_length).filter(lambda x: x["sentence_length"] > 3)
+
+# ----------------------------- TRAIN/VALIDATION/TEST ------------------------------------------------
+
+dataset_train_splitted = dataset_new_col_train.train_test_split(train_size=0.9, seed=42)
+# Rename the default "test" split to "validation"
+dataset_train_splitted["validation"] = dataset_train_splitted.pop("test")
+
+print(dataset_train_splitted)
+
+# ---------------------------- SHARE DATASET ON HUB --------------------------------------------------
+
+# HUGGING_FACE_PSEUDO = 'channotte'
+# HUGGING_FACE_DS_NAME = 'Georges_Sand'
+# dataset_train_splitted.push_to_hub(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_DS_NAME)
+# downloaded_dataset = load_dataset(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_DS_NAME)
+# print(downloaded_dataset)
