@@ -2,3 +2,5 @@ huggingface_hub
 datasets
 transformers
 tensorflow
+nltk
+keras

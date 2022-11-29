@@ -1,2 +1,5 @@
-*.json
-georgessand-*
+aurore/data/*
+aurore/model/*
+aurore/tokenizer/*
+aurore/*.ini
+aurore/__pycache__/*

@@ -1,5 +1,9 @@
-FROM tensorflow/tensorflow:latest
+FROM tensorflow/tensorflow:2.9.3
 
-RUN apt-get install git-lfs
+#RUN apt-get install git-lfs
 
-RUN  pip install -r requirements.txt
+COPY requirements.txt requirements.txt
+
+RUN  pip install --use-feature=2020-resolver -r requirements.txt 
+
+COPY aurore aurore

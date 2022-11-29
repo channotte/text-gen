@@ -2,47 +2,44 @@
 # Soit utiliser un tokenizer pré-entrainé, soit en entrainer un nouveau
 import transformers
 from transformers import AutoTokenizer
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
+from huggingface_hub import HfFolder
+from utils import CONFIG_FILE, config
 
-HUGGING_FACE_PSEUDO = 'channotte'
-HUGGING_FACE_DS_NAME = 'Georges_Sand'
+credentials = config(CONFIG_FILE)
+HfFolder.save_token(credentials["token"])
 
-downloaded_dataset = load_dataset(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_DS_NAME)
+# --------------------- Récupération du dataset ---------------------------------------
+
+# Soit en local
+downloaded_dataset = load_from_disk("aurore/data/")
+
+# Soit depuis le hub hugging face
+
+# HUGGING_FACE_PSEUDO = credentials["hugging_face_pseudo"]
+# HUGGING_FACE_DS_NAME = 'George_Sand'
+# downloaded_dataset = load_dataset(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_DS_NAME)
 
 # --------------------------- CAS 1 : Tokenizer pré-entrainé ---------------------------
 
-context_length = 100  # Taille max phrase
+print("------------------ TOKENIZER PRE ENTRAINE -------------------")
+# On donne une taille max de phrase possible
+CONTEXT_LENGTH = 100
+
+# On récupère un tokenizer pré entrainé sur du français pour gpt2 (sur hugging face il y en a pleins)
 pretrained_tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-french")
 
-# Nous savons que la plupart des commentaires contiennent plus de 40 tokens,
-# donc le simple fait de tronquer les entrées à la longueur maximale éliminerait une grande partie de notre ensemble de données.
-# Au lieu de cela, nous allons utiliser l'option return_overflowing_tokens pour tokeniser l'entrée entière et la diviser
-# en plusieurs morceaux. Nous utiliserons également l'option return_length pour retourner automatiquement la longueur de chaque
-# morceau créé. Souvent, le dernier morceau sera plus petit que la taille du contexte, et nous nous débarrasserons de ces morceaux
-# pour éviter les problèmes de remplissage ; nous n'en avons pas vraiment besoin car nous avons beaucoup de données de toute façon.
+print(f"Le vocabulaire a une taille de {len(pretrained_tokenizer)}")
 
-outputs = pretrained_tokenizer(
-    downloaded_dataset["train"][:2]["text"],
-    truncation=True,
-    max_length=context_length,
-    return_overflowing_tokens=False,
-    return_length=True,
-)
-
-print(f"Input IDs length: {len(outputs['input_ids'])}")
-print(f"Input chunk lengths: {(outputs['length'])}")
-
-print("vocab_size: ", len(pretrained_tokenizer))
-
-# From STR to token
+# Passage de la chaine de caractère au token
 txt = "Bonjour Madame, je m'appelle Georges Sand. Et vous ?"
 tokens = pretrained_tokenizer(txt)['input_ids']
 # On remarque les symboles spéciaux Ġ et Ċ qui indiquent les espaces et les retours à la ligne.
-print(tokens)
+print("Nombre associé à chaque token : \n",tokens)
 
-# We can convert back the token to string
+# On peut reconvertir le string tokenisé en chaine de caractères et voir son découpage
 converted = pretrained_tokenizer.convert_ids_to_tokens(tokens)
-print(converted)
+print("Chaine de caractères convertie en token : \n", converted, "\n")
 
 # Remarquez que le tokenizer pré-entraîné divise la chaîne donnée en une séquence de sous-mots.
 # Comme le suggère la documentation officielle, si un modèle de langue n'est pas disponible dans la langue
@@ -63,44 +60,50 @@ def get_training_corpus():
 
 training_corpus = get_training_corpus()
 
-for text in get_training_corpus():
-    print(len(text))
+print("------------------ TOKENIZER CUSTOMISE -------------------")
+
+print("Analyse des phrases pour l'entrainement du tokenizer :")
+
+for i, text in enumerate(get_training_corpus()):
+    print(f"Batch {i} : {len(text)} phrases d'entrainement.")
 
 vocab_size = 52000
 tokenizer = pretrained_tokenizer.train_new_from_iterator(training_corpus,vocab_size)
-print(tokenizer.eos_token_id)
-print(tokenizer.vocab_size)
+print("Le vocabulaire a une taille de ", tokenizer.vocab_size)
 
 txt = "Bonjour Madame, je m'appelle Georges Sand. Et vous ?"
 tokens = tokenizer(txt)['input_ids']
 # On remarque les symboles spéciaux Ġ et Ċ qui indiquent les espaces et les retours à la ligne.
-print(tokens)
+print("Nombre associé à chaque token : \n",tokens)
 
-# We can convert back the token to string
+# On peut reconvertir le string tokenisé en chaine de caractères et voir son découpage
 converted = tokenizer.convert_ids_to_tokens(tokens)
-print(converted)
+print("Chaine de caractères convertie en token : \n", converted)
 
 
 # Lequel est le meilleur ?
 
 
-print(len(tokenizer.tokenize(txt)))
-print(len(pretrained_tokenizer.tokenize(txt)))
+print(f"Il y a {len(tokenizer.tokenize(txt))} tokens pour le tokenizer customisé")
+print(f"Il y a {len(pretrained_tokenizer.tokenize(txt))} tokens pour le tokenizer pré-entrainé")
 
 # Le tokeniser qui sait le mieux généraliser ou celui qui permet d'avoir un token par mot ?
 
-# ---------------------------- Save and load tokenizer locally --------------------------------------------------
+# ---------------------------- Sauvegarde et chargement du tokenizer localement --------------------------------------------------
 
-path="./"
-file_name="georgessand-ds-mini"
+path="aurore/"
+file_name="tokenizer"
+
+# Sauvegarde du tokenizer en local
 tokenizer.save_pretrained(path+file_name)
+
+#Chargement du tokenizer
 loaded_tokenizer = AutoTokenizer.from_pretrained(path+file_name)
-print(tokenizer.tokenize(txt))
 
-# ---------------------------- PUSH TOKENIZER TO HUB--------------------------------------------------
+# ---------------------------- Envoie du tokenizer vers le HUB --------------------------------------------------
 
-# HUGGING_FACE_PSEUDO = 'channotte'
-# HUGGING_FACE_TOK_NAME = 'georgessand-ds-mini'
+# HUGGING_FACE_PSEUDO = credentials["hugging_face_pseudo"]
+# HUGGING_FACE_TOK_NAME = 'georgesand-ds-mini'
 # tokenizer.push_to_hub(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_TOK_NAME)
 # downloaded_tokenizer = AutoTokenizer.from_pretrained(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_TOK_NAME)
 # print(downloaded_tokenizer.tokenize(txt))
