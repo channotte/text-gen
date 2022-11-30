@@ -100,6 +100,11 @@ LELIA_URL = "https://www.gutenberg.org/files/39738/39738-0.txt"
 LA_PETITE_FADETTE_URL = "https://www.gutenberg.org/cache/epub/34204/pg34204.txt"
 GABRIEL_URL = "https://www.gutenberg.org/cache/epub/13380/pg13380.txt"
 LETTRE_VOYAGEUR_URL = "https://www.gutenberg.org/files/37989/37989-0.txt"
+LA_MARQUISE_URL = "https://www.gutenberg.org/cache/epub/13025/pg13025.txt"
+DAME_VERTES_URL = "https://www.gutenberg.org/cache/epub/69098/pg69098.txt"
+MEUNIER_ANGIBAULT_URL = "https://www.gutenberg.org/cache/epub/13892/pg13892.txt"
+COMPTESSE_RUDOLSTADT_URL = "https://www.gutenberg.org/files/17225/17225-0.txt"
+
 MARE_AU_DIABLE_URL = "https://www.gutenberg.org/files/23582/23582-0.txt"
 
 # Première étape créer un dictionnaire
@@ -111,6 +116,10 @@ dict_train = {
     "La petite fadette": LA_PETITE_FADETTE_URL,
     "Gabriel": GABRIEL_URL,
     "Lettre d'un voyageur": LETTRE_VOYAGEUR_URL,
+    "La Marquise" : LA_MARQUISE_URL,
+    "Les dames vertes" : DAME_VERTES_URL,
+    "Le meunier d'Angibault" : MEUNIER_ANGIBAULT_URL,
+    "La comptesse de Rudolstadt" : COMPTESSE_RUDOLSTADT_URL
 }
 
 dict_test = {"La Mare au Diable": MARE_AU_DIABLE_URL}

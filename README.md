@@ -14,6 +14,7 @@ Nous allons entrainer un réseau auteur de bout en bout qui aura la plume de Geo
 #### Se créer un compte Hugging Face
 
 #### Générer un token d'écriture sur Hugging Face.
+
 1. Pour cela, aller sur votre compte Hugging face > Settings > Access Tokens > New token 
 2. Copiez ce token
 3. Collez le dans le fichier aurore/credentials.ini après le TOKEN=

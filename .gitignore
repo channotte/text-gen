@@ -1,5 +1,5 @@
 aurore/data/*
 aurore/model/*
 aurore/tokenizer/*
-# aurore/*.ini
+aurore/*.ini
 aurore/__pycache__/*

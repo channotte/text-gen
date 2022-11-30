@@ -32,7 +32,7 @@ pretrained_tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-fren
 print(f"Le vocabulaire a une taille de {len(pretrained_tokenizer)}")
 
 # Passage de la chaine de caractère au token
-txt = "Bonjour Madame, je m'appelle Georges Sand. Et vous ?"
+txt = "Bonjour Madame, je m'appelle George Sand. Et vous ?"
 tokens = pretrained_tokenizer(txt)['input_ids']
 # On remarque les symboles spéciaux Ġ et Ċ qui indiquent les espaces et les retours à la ligne.
 print("Nombre associé à chaque token : \n",tokens)
@@ -71,7 +71,7 @@ vocab_size = 52000
 tokenizer = pretrained_tokenizer.train_new_from_iterator(training_corpus,vocab_size)
 print("Le vocabulaire a une taille de ", tokenizer.vocab_size)
 
-txt = "Bonjour Madame, je m'appelle Georges Sand. Et vous ?"
+txt = "Bonjour Madame, je m'appelle George Sand. Et vous ?"
 tokens = tokenizer(txt)['input_ids']
 # On remarque les symboles spéciaux Ġ et Ċ qui indiquent les espaces et les retours à la ligne.
 print("Nombre associé à chaque token : \n",tokens)

@@ -131,7 +131,7 @@ tf.keras.mixed_precision.set_global_policy("mixed_float16")
 print("\n Entrainement du modèle en cours ... \n")
 
 # epochs = Nombre d'itérations. Attention à ne pas faire exploser votre machine :D
-model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=100)
+model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=1000)
 
 print("Fin de l'entrainement, modèle sauvegardé en local ")
 model.save_pretrained("aurore/model/")
