@@ -3,4 +3,4 @@ datasets
 transformers
 tensorflow
 nltk
-keras
+keras==2.9.0
