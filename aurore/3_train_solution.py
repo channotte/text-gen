@@ -4,10 +4,12 @@ from transformers import AutoTokenizer
 from transformers import TFGPT2LMHeadModel
 from transformers import AutoConfig
 from transformers import create_optimizer
+from transformers import TrainingArguments, Trainer
 import tensorflow as tf
 from transformers import DataCollatorForLanguageModeling
 from datasets import load_dataset, load_from_disk
-from transformers.keras_callbacks import PushToHubCallback
+from tensorflow.keras.callbacks import ModelCheckpoint, Callback
+import logging
 from utils import CONFIG_FILE, config
 
 credentials = config(CONFIG_FILE)
@@ -18,8 +20,28 @@ context_length = 100
 
 #------------------ Fonctions d'entrainement -------------------------------------
 
+class Saver(Callback):
+    VAL_LOSS = 'val_loss'
+
+    def __init__(self, model, model_path) -> None:
+        super().__init__()
+        self.model = model
+        self.model_path = model_path
+        self.best_val_loss = None
+
+    def on_epoch_end(self, epoch, logs=None):
+        if self.best_val_loss is None:
+            self.best_val_loss = logs[Saver.VAL_LOSS]
+            self.model.save_pretrained(self.model_path)
+            logging.warning(f"\nInitialize saved model at epoch {epoch}\n")
+        elif self.best_val_loss > logs[Saver.VAL_LOSS]:
+            self.model.save_pretrained(self.model_path)
+            logging.warning(f"\nUpdated saved model at epoch {epoch} (previous loss: {self.best_val_loss}, current loss: {logs[Saver.VAL_LOSS]}\n")
+            self.best_val_loss = logs[Saver.VAL_LOSS]
+
+
 def tokenize(element):
-    print("Tokenization of the dataset.")
+
     outputs = tokenizer(
         element["text"],
         truncation=True,
@@ -29,13 +51,17 @@ def tokenize(element):
     )
     input_batch = []
     for length, input_ids in zip(outputs["length"], outputs["input_ids"]):
-        if length == context_length:
+        if length <= context_length:
             input_batch.append(input_ids)
+        else:
+            input_batch.append(input_ids[:context_length])
+
     return {"input_ids": input_batch}
 
 #--------------------- Récupération du dataset et du tokenizer -----------------
 
 dataset = load_from_disk("aurore/data/")
+
 
 # Récupération en mode local
 tokenizer = AutoTokenizer.from_pretrained(path+file_name)
@@ -46,6 +72,8 @@ tokenizer = AutoTokenizer.from_pretrained(path+file_name)
 #-------------------------- Tokénisation du dataset de phrases ------------------
 
 # Appel de la fonction tokenize qui va transformer chaque phrase du dataset en une phrase de token
+
+print("Dataset inital :", dataset)
 
 tokenized_datasets = dataset.map(
     tokenize, batched=True, remove_columns=dataset["train"].column_names
@@ -61,15 +89,6 @@ tokenizer.pad_token = tokenizer.eos_token
 data_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False, return_tensors="tf")
 
 
-out = data_collator([tokenized_datasets["train"][i] for i in range(5)])
-
-# for key in out:
-#     print(f"{key} shape: {out[key].shape}")
-
-# for key in out:
-#     print(f"{key}: {out[key][0]}")
-    
-
 #--------------------------- ETAPE 3 : Dataset -> TF DATASET --------------------------
 
 print("\n Conversion du dataset tokenisé en dataset tensorflow \n")
@@ -78,13 +97,13 @@ tf_train_dataset = tokenized_datasets["train"].to_tf_dataset(
     columns=["input_ids", "attention_mask", "labels"],
     collate_fn=data_collator,
     shuffle=True,
-    batch_size=32,
+    batch_size=8,
 )
 tf_eval_dataset = tokenized_datasets["validation"].to_tf_dataset(
     columns=["input_ids", "attention_mask", "labels"],
     collate_fn=data_collator,
     shuffle=False,
-    batch_size=32,
+    batch_size=8,
 )
 
 # Configuration du réseau GPT2
@@ -105,9 +124,6 @@ model.summary()
 
 # ------------------------ Configuration du réseau --------------------------------------
 
-# Appel du data Collator
-data_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False, return_tensors="tf")
-
 num_train_steps = len(tf_train_dataset)
 
 # lr scheduler pour améliorer la stabilité du réseau
@@ -120,48 +136,49 @@ optimizer, schedule = create_optimizer(
     weight_decay_rate=0.01,
 )
 
-# Compilation du modèle
+# # Compilation du modèle
 
 model.compile(optimizer=optimizer)
 tf.keras.mixed_precision.set_global_policy("mixed_float16")
 
 
-#---------------------------------- ENTRAINEMENT ---------------------------------------------------------------------
+# #---------------------------------- ENTRAINEMENT ---------------------------------------------------------------------
 
 print("\n Entrainement du modèle en cours ... \n")
 
-# epochs = Nombre d'itérations. Attention à ne pas faire exploser votre machine :D
-model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=1000)
 
-print("Fin de l'entrainement, modèle sauvegardé en local ")
-model.save_pretrained("aurore/model/")
+# epochs = Nombre d'itérations. Attention à ne pas faire exploser votre machine :D
+saver = Saver(model, "aurore/model/")
+
+model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=1000, callbacks=[saver])
+
 
 # -------------------- Pousser le réseau entrainé sur le HUB ---------------------------------
 
-# On doit installer git-lfs pour cela :
+# # On doit installer git-lfs pour cela :
 
-# Linux : apt-get install git-lfs
-# Windows : Installer git, puis télécharger une version depuis https://github.com/git-lfs/git-lfs/releases/tag/v3.2.0
-# MacOS : avec HomeBrew, faire  brew update    puis  brew install git-lfs
+# # Linux : apt-get install git-lfs
+# # Windows : Installer git, puis télécharger une version depuis https://github.com/git-lfs/git-lfs/releases/tag/v3.2.0
+# # MacOS : avec HomeBrew, faire  brew update    puis  brew install git-lfs
 
-# -------- Une fois téléchargé pour tous -------------
+# # -------- Une fois téléchargé pour tous -------------
 
-# Ensuite lancer : git lfs install
+# # Ensuite lancer : git lfs install
 
-# Et configurer git
-#!git config --global user.email "yourmail@gmail.com"
-#!git config --global user.name "yourusername"
+# # Et configurer git
+# #!git config --global user.email "yourmail@gmail.com"
+# #!git config --global user.name "yourusername"
 
-# ----------- Enregistrement du modèle ----------------
+# # ----------- Enregistrement du modèle ----------------
 
-#HUGGING_FACE_PSEUDO = credentials["hugging_face_pseudo"]
-#MODEL_NAME = 'gpt2-George-sand'
+# #HUGGING_FACE_PSEUDO = credentials["hugging_face_pseudo"]
+# #MODEL_NAME = 'gpt2-George-sand'
 
-# Soit une fois pour toute à la fin de l'entrainement :
+# # Soit une fois pour toute à la fin de l'entrainement :
 
-#model.push_to_hub(HUGGING_FACE_PSEUDO+"/"+MODEL_NAME)
+# #model.push_to_hub(HUGGING_FACE_PSEUDO+"/"+MODEL_NAME)
 
-# Soit pendant l'entrainement au fur et à mesure :
+# # Soit pendant l'entrainement au fur et à mesure :
 
-#callback = PushToHubCallback(output_dir=HUGGING_FACE_PSEUDO+"/"+MODEL_NAME, tokenizer=tokenizer)
-#model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=3, callbacks=[callback])
+# #callback = PushToHubCallback(output_dir=HUGGING_FACE_PSEUDO+"/"+MODEL_NAME, tokenizer=tokenizer)
+# #model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=3, callbacks=[callback])
