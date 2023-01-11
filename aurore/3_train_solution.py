@@ -10,11 +10,14 @@ from transformers import DataCollatorForLanguageModeling
 from datasets import load_dataset, load_from_disk
 from tensorflow.keras.callbacks import ModelCheckpoint, Callback
 import logging
+from datetime import datetime
+from pathlib import Path
 from utils import CONFIG_FILE, config
 
 credentials = config(CONFIG_FILE)
 
-path="aurore/"
+AURORE_PATH= Path("aurore")
+MODEL_PATH = AURORE_PATH / 'model'
 file_name="tokenizer"
 context_length = 100
 
@@ -23,11 +26,15 @@ context_length = 100
 class Saver(Callback):
     VAL_LOSS = 'val_loss'
 
-    def __init__(self, model, model_path) -> None:
+    def __init__(self, model) -> None:
         super().__init__()
         self.model = model
-        self.model_path = model_path
         self.best_val_loss = None
+
+        now = datetime.now()
+        date = now.strftime("%Y-%m-%d %H:%M:%S")
+
+        self.model_path = MODEL_PATH / date
 
     def on_epoch_end(self, epoch, logs=None):
         if self.best_val_loss is None:
@@ -64,7 +71,7 @@ dataset = load_from_disk("aurore/data/")
 
 
 # Récupération en mode local
-tokenizer = AutoTokenizer.from_pretrained(path+file_name)
+tokenizer = AutoTokenizer.from_pretrained(AURORE_PATH/file_name)
 
 # Récupération du tokenizer pré-entrainé
 #tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-french")
@@ -148,7 +155,7 @@ print("\n Entrainement du modèle en cours ... \n")
 
 
 # epochs = Nombre d'itérations. Attention à ne pas faire exploser votre machine :D
-saver = Saver(model, "aurore/model/")
+saver = Saver(model)
 
 model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=1000, callbacks=[saver])
 
