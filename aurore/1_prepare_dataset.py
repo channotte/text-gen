@@ -90,7 +90,7 @@ def prepare_dataset(data_dict: dict) -> list:
     return prepared_text_list
 
 
-def compute_sentence_length(example: datasets.arrow_dataset.Example) -> str:
+def compute_sentence_length(example) -> str:
     return {"sentence_length": len(example["text"].split())}
 
 
