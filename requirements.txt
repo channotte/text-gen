@@ -6,3 +6,4 @@ nltk
 keras==2.9.0
 flask
 flask-socketio
+torch==1.13
