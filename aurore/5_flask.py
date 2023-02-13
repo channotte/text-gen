@@ -1,21 +1,12 @@
 from flask import Flask, render_template
-from flask_socketio import SocketIO
+import logging
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'vnkdjnfjknfl1232#'
-socketio = SocketIO(app)
 
 @app.route('/')
-def sessions():
-    return render_template('session.html')
-
-def messageReceived(methods=['GET', 'POST']):
-    print('message was received!!!')
-
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['GET', 'POST']):
-    print('received my event: ' + str(json))
-    socketio.emit('my response', json, callback=messageReceived)
+def home(name=None):
+    return render_template('home.html', name=name)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    logging.basicConfig(level=logging.DEBUG)
+    app.run(host="0.0.0.0", port=80)
