@@ -127,8 +127,8 @@ num_train_steps = len(tf_train_dataset)
 # Au début lr élevé pour trouver l'optimum pour ensuite se stabiliser
 
 optimizer, schedule = create_optimizer(
-    init_lr=5e-5,
-    num_warmup_steps=1_000,
+    init_lr=5e-4,
+    num_warmup_steps=3000,
     num_train_steps=num_train_steps,
     weight_decay_rate=0.01,
 )
