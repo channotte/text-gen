@@ -35,7 +35,7 @@ class Saver(Callback):
         self.best_val_loss = None
 
         now = datetime.now()
-        date = now.strftime("%Y-%m-%d %H:%M:%S")
+        date = now.strftime("%Y%m%d%H%M%S")
 
         self.model_path = MODEL_PATH / date
 
