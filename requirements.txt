@@ -1,6 +1,6 @@
 huggingface_hub
 datasets
-tensorflow
+tensorflow==2.9.3
 transformers==4.26.0
 nltk
 keras==2.9.0
