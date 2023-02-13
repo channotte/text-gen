@@ -9,6 +9,9 @@ from utils import CONFIG_FILE, config
 credentials = config(CONFIG_FILE)
 HfFolder.save_token(credentials["token"])
 
+MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
+
+
 # --------------------- Récupération du dataset ---------------------------------------
 
 # Soit en local
@@ -27,7 +30,7 @@ print("------------------ TOKENIZER PRE ENTRAINE -------------------")
 CONTEXT_LENGTH = 100
 
 # On récupère un tokenizer pré entrainé sur du français pour gpt2 (sur hugging face il y en a pleins)
-pretrained_tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-french")
+pretrained_tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 print(f"Le vocabulaire a une taille de {len(pretrained_tokenizer)}")
 

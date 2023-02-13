@@ -8,6 +8,7 @@ from utils import CONFIG_FILE, config
 
 credentials = config(CONFIG_FILE)
 HfFolder.save_token(credentials["token"])
+MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
 
 # --------------------- Récupération du dataset ---------------------------------------
 

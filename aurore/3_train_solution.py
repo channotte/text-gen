@@ -21,6 +21,9 @@ MODEL_PATH = AURORE_PATH / 'model'
 file_name="tokenizer"
 context_length = 100
 
+MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
+
+
 #------------------ Fonctions d'entrainement -------------------------------------
 
 class Saver(Callback):
@@ -71,10 +74,11 @@ dataset = load_from_disk("aurore/data/")
 
 
 # Récupération en mode local
-tokenizer = AutoTokenizer.from_pretrained(AURORE_PATH/file_name)
+#tokenizer = AutoTokenizer.from_pretrained(AURORE_PATH/file_name)
 
 # Récupération du tokenizer pré-entrainé
-#tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-french")
+# Récupération en mode local
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 #-------------------------- Tokénisation du dataset de phrases ------------------
 
@@ -115,17 +119,19 @@ tf_eval_dataset = tokenized_datasets["validation"].to_tf_dataset(
 
 # Configuration du réseau GPT2
 config = AutoConfig.from_pretrained(
-    "gpt2",
+    MODEL_NAME,
     vocab_size=len(tokenizer),
     n_ctx=context_length,
     bos_token_id=tokenizer.bos_token_id,
     eos_token_id=tokenizer.eos_token_id,
 )
 
-# Initialisation of the model =/= from pretrained
+# Initialisation du modele
 
 model = TFGPT2LMHeadModel(config)
 print("Construction du modèle")
+model = model.from_pretrained(MODEL_NAME, from_pt=True)
+
 model(model.dummy_inputs)
 model.summary()
 
@@ -157,7 +163,7 @@ print("\n Entrainement du modèle en cours ... \n")
 # epochs = Nombre d'itérations. Attention à ne pas faire exploser votre machine :D
 saver = Saver(model)
 
-model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=1000, callbacks=[saver])
+model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=10, callbacks=[saver])
 
 
 # -------------------- Pousser le réseau entrainé sur le HUB ---------------------------------

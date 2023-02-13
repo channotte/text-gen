@@ -218,11 +218,11 @@ print(dataset_train_splitted)
 # On le sauvegarde en local
 dataset_train_splitted.save_to_disk("aurore/data/")
 
-with open("aurore/data/train_text.txt", "w") as f:
+with open("aurore/data/train_text.txt", "w", encoding="utf-8") as f:
     f.writelines(
         [sentence + '\n' for sentence in dataset_train_splitted['train']['text']])
 
-with open("aurore/data/validation_text.txt", "w") as f:
+with open("aurore/data/validation_text.txt", "w", encoding="utf-8") as f:
     f.writelines(
         [sentence + '\n' for sentence in dataset_train_splitted['validation']['text']])
 print("Dataset saved to disk")

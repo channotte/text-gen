@@ -11,16 +11,38 @@ HfFolder.save_token(credentials["token"])
 path="aurore/"
 file_name="tokenizer"
 
+MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
 
 #---------------- Chargement du DS, Tokenizer et du modèle ----------------------------------
 
 print("\n Chargement du dataset, tokenizer et modèle \n")
 
-#--------- En mode local --------------------------------
+#--------- En mode local : Model Pré-entrainé Hugging Face --------------
 
 dataset = load_from_disk("aurore/data/")['validation']
-model = TFGPT2LMHeadModel.from_pretrained("aurore/model/", local_files_only=True)
-tokenizer = AutoTokenizer.from_pretrained(path+file_name)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+# Configuration du réseau GPT2
+config = AutoConfig.from_pretrained(
+   MODEL_NAME,
+    vocab_size=len(tokenizer),
+    n_ctx=100,
+    bos_token_id=tokenizer.bos_token_id,
+    eos_token_id=tokenizer.eos_token_id,
+)
+
+# Initialisation of the model =/= from pretrained
+
+model = TFGPT2LMHeadModel(config)
+print("Construction du modèle")
+model = model.from_pretrained(MODEL_NAME, from_pt=True)
+
+#--------- En mode local : Model entrainé --------------
+
+# dataset = load_from_disk("aurore/data/")['validation']
+# model = TFGPT2LMHeadModel.from_pretrained("aurore/model/", local_files_only=True)
+# tokenizer = AutoTokenizer.from_pretrained(path+file_name)
+
 
 #----------- En mode HUB -------------------------------
 # HUGGING_FACE_PSEUDO = credentials["hugging_face_pseudo"]
