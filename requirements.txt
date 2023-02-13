@@ -4,10 +4,6 @@ tensorflow==2.9.3
 transformers==4.26.0
 nltk
 keras==2.9.0
-<<<<<<< HEAD
-flask
-=======
 flask
 flask-socketio
 torch==1.13
->>>>>>> 4b24a1465d4b8486d164fa65bb5e6330edf53425
