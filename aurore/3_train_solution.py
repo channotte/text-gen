@@ -23,6 +23,26 @@ context_length = 100
 
 MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
 
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+# Configuration du réseau GPT2
+config = AutoConfig.from_pretrained(
+    MODEL_NAME,
+    vocab_size=len(tokenizer),
+    n_ctx=context_length,
+    bos_token_id=tokenizer.bos_token_id,
+    eos_token_id=tokenizer.eos_token_id,
+)
+
+# Initialisation du modele
+
+model = TFGPT2LMHeadModel(config)
+print("Construction du modèle")
+model = model.from_pretrained(MODEL_NAME, from_pt=True)
+
+model(model.dummy_inputs)
+model.summary()
+
 
 #------------------ Fonctions d'entrainement -------------------------------------
 
@@ -78,7 +98,7 @@ dataset = load_from_disk("aurore/data/")
 
 # Récupération du tokenizer pré-entrainé
 # Récupération en mode local
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
 
 #-------------------------- Tokénisation du dataset de phrases ------------------
 
@@ -116,24 +136,6 @@ tf_eval_dataset = tokenized_datasets["validation"].to_tf_dataset(
     shuffle=False,
     batch_size=8,
 )
-
-# Configuration du réseau GPT2
-config = AutoConfig.from_pretrained(
-    MODEL_NAME,
-    vocab_size=len(tokenizer),
-    n_ctx=context_length,
-    bos_token_id=tokenizer.bos_token_id,
-    eos_token_id=tokenizer.eos_token_id,
-)
-
-# Initialisation du modele
-
-model = TFGPT2LMHeadModel(config)
-print("Construction du modèle")
-model = model.from_pretrained(MODEL_NAME, from_pt=True)
-
-model(model.dummy_inputs)
-model.summary()
 
 # ------------------------ Configuration du réseau --------------------------------------
 

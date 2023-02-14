@@ -21,20 +21,20 @@ print("\n Chargement du dataset, tokenizer et modèle \n")
 dataset = load_from_disk("aurore/data/")['validation']
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-# Configuration du réseau GPT2
+# Construction de la configuration GPT2
 config = AutoConfig.from_pretrained(
-   MODEL_NAME,
-    vocab_size=len(tokenizer),
-    n_ctx=100,
-    bos_token_id=tokenizer.bos_token_id,
-    eos_token_id=tokenizer.eos_token_id,
+    #######,
+    vocab_size=####,
+    n_ctx=#####,
+    bos_token_id=####,
+    eos_token_id=####,
 )
 
 # Initialisation of the model =/= from pretrained
 
-model = TFGPT2LMHeadModel(config)
+model = #### Chargement de la config
 print("Construction du modèle")
-model = model.from_pretrained(MODEL_NAME, from_pt=True)
+model = #### Chargement du modèle
 
 #--------- En mode local : Model entrainé --------------
 
@@ -61,12 +61,9 @@ pipe = pipeline(
 
 #-------------------- Génération de texte --------------------------------------------------
 
-prompts = ["Cette jeune femme était assise","Le soir, elle se rappellait"]
+prompts = # liste de phrase de prompt
 
-output0=pipe(prompts, num_return_sequences=1)[0][0]["generated_text"]
-output1=pipe(prompts, num_return_sequences=1)[1][0]["generated_text"]
+output0= # output du premier élément de la liste prompts après appel à pipe()
+output1= # output du second élément de la liste prompts après appel à pipe()
 
-print("Pour le texte entré :  ", prompts[0], " le text généré est :")
-print(output0)
-print("Pour le texte entré :  ", prompts[1], " le text généré est :")
-print(output1)
+#### Afficher les résultats

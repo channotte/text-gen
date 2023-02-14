@@ -18,6 +18,31 @@ context_length = 100
 
 MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
 
+#------------------ Chargement du dataset et paramètres -----------
+
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+# Configuration du réseau GPT2
+config = AutoConfig.from_pretrained(
+    MODEL_NAME,
+    vocab_size=len(tokenizer),
+    n_ctx=context_length,
+    bos_token_id=tokenizer.bos_token_id,
+    eos_token_id=tokenizer.eos_token_id,
+)
+
+# Initialisation du modele
+
+model = TFGPT2LMHeadModel(config)
+print("Construction du modèle")
+model = model.from_pretrained(MODEL_NAME, from_pt=True)
+
+model(model.dummy_inputs)
+
+# TODO Appel de summary() sur model et l'afficher
+summary = ###
+print(summary)
+
 #------------------ Fonctions de tokenization du dataset -------------------------
 
 def tokenize(element):
@@ -37,28 +62,18 @@ def tokenize(element):
 
 #--------------------- Récupération du dataset et du tokenizer -----------------
 
-# TODO :Récupération en mode local du tokenizer
-tokenizer = None
-if not tokenizer:
-    raise NotImplementedError
-
-# TODO : charger le jeu de données
+# TODO : charger le jeu de données (local suite au lancement du 1_solution)
 dataset = None
 if not dataset:
     raise NotImplementedError
-
-# Récupération du tokenizer pré-entrainé en mode HUB
-#tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-french")
 
 #-------------------------- Tokénisation du dataset de phrases ------------------
 
 # Appel de la fonction tokenize qui va transformer chaque phrase du dataset en une phrase de token
 
-# TODO : appel de la fonction map sur le dataset et de tokenize
-tokenized_datasets = None
-
-if not tokenized_datasets:
-    raise NotImplementedError
+tokenized_datasets =  dataset.map(
+    tokenize, batched=True, remove_columns=dataset["train"].column_names
+)
 
 print("Dataset tokenisé :", tokenized_datasets)
 
@@ -66,11 +81,7 @@ print("Dataset tokenisé :", tokenized_datasets)
 
 tokenizer.pad_token = tokenizer.eos_token
 
-# TODO : Créer une instance de la classe DataCollator
-data_collator = None
-
-if not data_collator:
-    raise NotImplementedError
+data_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False, return_tensors="tf")
 
 out = data_collator([tokenized_datasets["train"][i] for i in range(5)])
 
@@ -89,37 +100,17 @@ tf_train_dataset = tokenized_datasets["train"].to_tf_dataset(
     columns=["input_ids", "attention_mask", "labels"],
     collate_fn=data_collator,
     shuffle=True,
-    batch_size=32,
+    batch_size=8,
 )
 tf_eval_dataset = tokenized_datasets["validation"].to_tf_dataset(
     columns=["input_ids", "attention_mask", "labels"],
     collate_fn=data_collator,
     shuffle=False,
-    batch_size=32,
+    batch_size=8,
 )
-
-# Configuration du réseau GPT2
-config = AutoConfig.from_pretrained(
-    MODEL_NAME,
-    vocab_size=len(tokenizer),
-    n_ctx=context_length,
-    bos_token_id=tokenizer.bos_token_id,
-    eos_token_id=tokenizer.eos_token_id,
-)
-
-# Initialisation du modele
-
-model = TFGPT2LMHeadModel(config)
-print("Construction du modèle")
-model = model.from_pretrained(MODEL_NAME, from_pt=True)
-
-model(model.dummy_inputs)
-model.summary()
 
 # ------------------------ Configuration du réseau --------------------------------------
 
-# Appel du data Collator
-data_collator = DataCollatorForLanguageModeling(tokenizer, mlm=False, return_tensors="tf")
 
 num_train_steps = len(tf_train_dataset)
 
@@ -144,7 +135,9 @@ tf.keras.mixed_precision.set_global_policy("mixed_float16")
 print("\n Entrainement du modèle en cours ... \n")
 
 # epochs = Nombre d'itérations. Attention à ne pas faire exploser votre machine :D
-model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=100)
+#TODO : appeler la fonction fit sur le modele
+model.#########
+model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=1)
 
 print("Fin de l'entrainement, modèle sauvegardé en local ")
 model.save_pretrained("aurore/model/")
