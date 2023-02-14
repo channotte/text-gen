@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Homem</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&family=Rye&display=swap" rel="stylesheet"> 
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aurore.css') }}">
+
+
+</head>
+
+<body>
+  <h1>Aurore - Text</h1>
+
+  <div class="input-group">
+    <form method="post">
+      <label for="amorce">Il était une fois : </label>
+      <input type="text" name="amorce"
+              value="{{ request.form['amorce'] }}"></input>
+      <div>
+
+        {% if text %}
+          <p>{{ text }}!</p>
+        {% endif %}
+    
+      </div>
+      <button class='btn-secondary' type="submit">Générer</button>
+    </form>
+  
+  </div>
+
+ 
+
+
+</body>
+
+</html>

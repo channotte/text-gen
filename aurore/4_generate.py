@@ -1,7 +1,6 @@
 from transformers import pipeline
 from transformers import AutoTokenizer, TFGPT2LMHeadModel, AutoConfig
 from datasets import load_dataset, load_from_disk
-from tensorflow.keras.models import load_model
 from huggingface_hub import HfFolder
 from utils import CONFIG_FILE, config
 
