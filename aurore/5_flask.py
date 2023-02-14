@@ -7,9 +7,15 @@ from huggingface_hub import HfFolder
 from utils import CONFIG_FILE, config
 
 class TextGenerator:
+    """
+    load relevant tokenizer and neural network to generate text
+    """
     MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
 
     def __init__(self) -> None:
+        """
+        load only once tokenizer and neural network
+        """
         self.tokenizer = AutoTokenizer.from_pretrained(TextGenerator.MODEL_NAME)
         # Configuration du réseau GPT2
         config = AutoConfig.from_pretrained(
@@ -28,6 +34,9 @@ class TextGenerator:
         self.pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, device=0)
 
     def get_text(self, prompt):
+        """
+        tokenize prompt, generate following tokens using neural network and convert these tokens to human readable text
+        """
         return self.pipe([prompt], num_return_sequences=1)[0][0]["generated_text"]
 
 
@@ -38,6 +47,10 @@ text_generator = TextGenerator()
 
 @app.route("/generate", methods=('GET', 'POST'))
 def generate_text():
+    """
+    if form contains text, use it as prompt to generate 
+    next text with neural network and send it to hmtl template
+    """
 
     if request.method == 'POST':
         prompt = request.form['amorce']
@@ -51,6 +64,9 @@ def generate_text():
 
 @app.route('/')
 def home():
+    """
+    launch home page
+    """
     return render_template('home.html')
 
 if __name__ == '__main__':
