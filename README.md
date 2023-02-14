@@ -24,8 +24,13 @@ Nous allons entrainer un réseau auteur de bout en bout qui aura la plume de Geo
 
 `docker build -t text-gen .`
 
-#### Pour lancer un script python avec Docker sur Linux :
-`docker run -v $PWD/aurore:/aurore text-gen python aurore/<nom du fichier>.py`
+#### Pour lancer l'application web : 
+`docker run -v $PWD/aurore:/aurore aurore python aurore/5_flask.py`
+
+et ouvrez l'une des deux urls suivants :
+
++ http://172.17.0.2/generate : pour utiliser le réseau de neurones
++ http://172.17.0.2/ : pour avoir des informations sur le projet Aurore
 
 #### Codez !
 
