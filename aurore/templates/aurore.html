@@ -21,6 +21,26 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 <body>
   <h1>Aurore </h1>
 
+  <div class="input-group">
+    <form method="post">
+      <label for="amorce">Il était une fois : </label>
+      <input type="text" name="amorce"
+              value="{{ request.form['amorce'] }}"></input>
+      <div>
+
+        {% if text %}
+          <p>{{ text }}!</p>
+        {% endif %}
+    
+      </div>
+      <button class='btn-secondary' type="submit">Générer</button>
+    </form>
+  
+  </div>
+
+ 
+
+
 </body>
 
 </html>

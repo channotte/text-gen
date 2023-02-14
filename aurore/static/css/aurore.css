@@ -1,11 +1,9 @@
-
-
 @font-face {
-    font-family: 'rumble_braveregular';
-    src: url('fonts/rumble_brave-webfont.woff2') format('woff2'),
-         url('fonts/rumble_brave-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
+	font-family: 'rumble_braveregular';
+	src: url('fonts/rumble_brave-webfont.woff2') format('woff2'),
+		url('fonts/rumble_brave-webfont.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
 
 }
 
@@ -14,33 +12,38 @@ body {
 	padding-top: 20px;
 	padding-left: 50px;
 	padding-right: 50px;
-	font-family:'alegreya';
+	font-family: 'alegreya';
 	background-repeat: repeat;
-	width:80%;
-	margin-left:auto;
-	margin-right:auto;
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 
-h1{
+h1 {
 	font-family: 'rumble_braveregular';
 	line-height: 1.5;
 	font-size: 70px;
 	text-align: left;
-	color:#b68d3b;
+	color: #b68d3b;
 	margin-bottom: 50px;
 	margin-top: 50px;
 	text-shadow: -1px 0 #96280f, 0 1px #96280f, 1px 0 #96280f, 0 -1px #96280f;
 }
 
-h2 {
-	color:white;
+
+label {
+	color: white;
+	font-family: 'alegreya';
+	font-size: 30px;
 }
 
 p {
-	color:white;
+	color: white;
+	font-family: 'alegreya';
+	font-size: 20px;
 }
 
-div{
-	margin: 50px;
+div {
+	margin: 20px;
 }
