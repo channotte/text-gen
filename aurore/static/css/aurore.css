@@ -47,3 +47,14 @@ p {
 div {
 	margin: 20px;
 }
+
+.image-container {
+	display: flex;
+	justify-content: center;
+}
+
+.btn-secondary, .btn-lg, .btn-block{ 
+	color: #ffffff; 
+	background-color: #58ABC7; 
+	border-color: #70C4E0; 
+  } 

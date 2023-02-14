@@ -22,6 +22,7 @@ print("\n Chargement du dataset, tokenizer et modèle \n")
 
 dataset = load_from_disk("aurore/data/")['validation']
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+tokenizer.pad_token = tokenizer.eos_token
 
 # Configuration du réseau GPT2
 config = AutoConfig.from_pretrained(
