@@ -24,6 +24,7 @@ class TextGenerator:
 
         model = TFGPT2LMHeadModel(config)
         self.model = model.from_pretrained(TextGenerator.MODEL_NAME, from_pt=True)
+        self.model(self.model.dummy_inputs)
         self.pipe = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, device=0)
 
     def get_text(self, prompt):
@@ -45,7 +46,7 @@ def generate_text():
         text = ""
 
     logging.warning(text)
-    return render_template('text.html', text=text)
+    return render_template('aurore.html', text=text)
 
 
 @app.route('/')

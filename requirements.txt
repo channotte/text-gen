@@ -5,3 +5,4 @@ transformers==4.26.0
 nltk
 keras==2.9.0
 flask
+torch
