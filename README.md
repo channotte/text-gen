@@ -25,7 +25,9 @@ Nous allons entrainer un réseau auteur de bout en bout qui aura la plume de Geo
 `docker build -t text-gen .`
 
 #### Pour lancer l'application web : 
-`docker run -v $PWD/aurore:/aurore aurore python aurore/5_flask.py`
+
++ Sous linux : `docker run -v $PWD/aurore:/aurore aurore python aurore/5_flask.py`
++ Sous windows : `docker run -p 127.0.0.1:80:80 -v $PWD/aurore:/aurore aurore python aurore/5_flask.py`
 
 et ouvrez l'une des deux urls suivants :
 
