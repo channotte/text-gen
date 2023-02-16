@@ -3,3 +3,4 @@ aurore/model/*
 aurore/tokenizer/*
 aurore/*.ini
 aurore/__pycache__/*
+venv/

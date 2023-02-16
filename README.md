@@ -39,3 +39,27 @@ et ouvrez l'une des deux urls suivants :
 Bon courage à tous. 
 
 En cas de soucis, n'hésitez pas à nous solliciter !
+
+#### Je n'arrive pas à faire fonctionner le docker
+
+**Plan B :  utiliser un environnement virtuel** 
+
+1 - créer l'environnement
+```
+python3 -m venv venv
+```
+2 - l'activer
+
+Sous windows : `.\venv\Scripts\activate`
+Sous linux : `source .\venv\bin\activate`
+
+3 - installer les requierements 
+`pip install -r requirements.txt`
+
+4 - lancer l'application web
+
+`python .\aurore\5_flask.py`
+
+**Plan C : utiliser codelab**
+
+Vous n'aurez pas l'application Flask, mais vous pourrez coder avec les autres
