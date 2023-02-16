@@ -1,6 +1,5 @@
 from transformers import pipeline
 from transformers import AutoTokenizer, TFGPT2LMHeadModel, AutoConfig
-from datasets import load_dataset, load_from_disk
 from huggingface_hub import HfFolder
 from utils import CONFIG_FILE, config
 
@@ -12,16 +11,12 @@ file_name="tokenizer"
 
 MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
 
-#---------------- Chargement du DS, Tokenizer et du modèle ----------------------------------
+#---------------- Chargement du Tokenizer et du modèle ----------------------------------
 
-print("\n Chargement du dataset, tokenizer et modèle \n")
-
-#--------- En mode local : Model Pré-entrainé Hugging Face --------------
-
-dataset = load_from_disk("aurore/data/")['validation']
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+tokenizer.pad_token = tokenizer.eos_token
 
-# Construction de la configuration GPT2
+#TODO Construction de la configuration GPT2
 config = AutoConfig.from_pretrained(
     #######,
     vocab_size=####,
@@ -30,26 +25,23 @@ config = AutoConfig.from_pretrained(
     eos_token_id=####,
 )
 
-# Initialisation of the model =/= from pretrained
+# TODO instancier le modèle
 
-model = #### Chargement de la config
+model = #### Chargement de la config dans le modèle
 print("Construction du modèle")
-model = #### Chargement du modèle
+model = #### appel de model et de from_pretrained pour charger le modèle
 
 #--------- En mode local : Model entrainé --------------
 
-# dataset = load_from_disk("aurore/data/")['validation']
 # model = TFGPT2LMHeadModel.from_pretrained("aurore/model/", local_files_only=True)
 # tokenizer = AutoTokenizer.from_pretrained(path+file_name)
 
 
 #----------- En mode HUB -------------------------------
 # HUGGING_FACE_PSEUDO = credentials["hugging_face_pseudo"]
-# HUGGING_FACE_DS_NAME = 'George_Sand'
 # MODEL_NAME = 'gpt2-George-sand'
 
 #tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-french")
-#dataset = load_dataset(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_DS_NAME, split="validation")
 #model = TFGPT2LMHeadModel.from_pretrained(HUGGING_FACE_PSEUDO+"/"+ MODEL_NAME)
 
 
@@ -61,9 +53,11 @@ pipe = pipeline(
 
 #-------------------- Génération de texte --------------------------------------------------
 
+# TODO :
+
 prompts = # liste de phrase de prompt
 
 output0= # output du premier élément de la liste prompts après appel à pipe()
 output1= # output du second élément de la liste prompts après appel à pipe()
 
-#### Afficher les résultats
+#### TODO Afficher les résultats

@@ -1,7 +1,5 @@
 from transformers import pipeline
 from transformers import AutoTokenizer, TFGPT2LMHeadModel, AutoConfig
-from datasets import load_dataset, load_from_disk
-from tensorflow.keras.models import load_model
 from huggingface_hub import HfFolder
 from utils import CONFIG_FILE, config
 
@@ -13,14 +11,8 @@ file_name="tokenizer"
 
 MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
 
-#---------------- Chargement du DS, Tokenizer et du modèle ----------------------------------
+#---------------- Chargement du Tokenizer et du modèle ----------------------------------
 
-print("\n Chargement du dataset, tokenizer et modèle \n")
-
-
-#--------- En mode local : Model Pré-entrainé Hugging Face --------------
-
-dataset = load_from_disk("aurore/data/")['validation']
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 tokenizer.pad_token = tokenizer.eos_token
 
@@ -42,17 +34,14 @@ model = model.from_pretrained(MODEL_NAME, from_pt=True)
 
 #--------- En mode local : Model entrainé --------------
 
-# dataset = load_from_disk("aurore/data/")['validation']
 # model = TFGPT2LMHeadModel.from_pretrained("aurore/model/", local_files_only=True)
 # tokenizer = AutoTokenizer.from_pretrained(path+file_name)
 
 #----------- En mode HUB -------------------------------
 # HUGGING_FACE_PSEUDO = credentials["hugging_face_pseudo"]
-# HUGGING_FACE_DS_NAME = 'George_Sand'
 # MODEL_NAME = 'gpt2-George-sand'
 
 #tokenizer = AutoTokenizer.from_pretrained("benjamin/gpt2-wechsel-french")
-#dataset = load_dataset(HUGGING_FACE_PSEUDO+"/"+ HUGGING_FACE_DS_NAME, split="validation")
 #model = TFGPT2LMHeadModel.from_pretrained(HUGGING_FACE_PSEUDO+"/"+ MODEL_NAME)
 
 
