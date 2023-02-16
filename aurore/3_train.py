@@ -4,8 +4,12 @@ from transformers import AutoTokenizer
 from transformers import TFGPT2LMHeadModel
 from transformers import AutoConfig
 from transformers import create_optimizer
+import logging
+from datetime import datetime
 import tensorflow as tf
+from pathlib import Path
 from transformers import DataCollatorForLanguageModeling
+from tensorflow.keras.callbacks import ModelCheckpoint, Callback
 from datasets import load_dataset, load_from_disk
 from transformers.keras_callbacks import PushToHubCallback
 from utils import CONFIG_FILE, config
@@ -17,7 +21,8 @@ file_name="tokenizer"
 context_length = 100
 
 MODEL_NAME  = 'benjamin/gpt2-wechsel-french'
-
+AURORE_PATH= Path("aurore")
+MODEL_PATH = AURORE_PATH / 'model'
 #------------------ Chargement du dataset et paramètres -----------
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -44,6 +49,29 @@ summary = ###
 print(summary)
 
 #------------------ Fonctions de tokenization du dataset -------------------------
+
+class Saver(Callback):
+    VAL_LOSS = 'val_loss'
+
+    def __init__(self, model) -> None:
+        super().__init__()
+        self.model = model
+        self.best_val_loss = None
+
+        now = datetime.now()
+        date = now.strftime("%Y-%m-%d %H:%M:%S")
+
+        self.model_path = MODEL_PATH / date
+
+    def on_epoch_end(self, epoch, logs=None):
+        if self.best_val_loss is None:
+            self.best_val_loss = logs[Saver.VAL_LOSS]
+            self.model.save_pretrained(self.model_path)
+            logging.warning(f"\nInitialize saved model at epoch {epoch}\n")
+        elif self.best_val_loss > logs[Saver.VAL_LOSS]:
+            self.model.save_pretrained(self.model_path)
+            logging.warning(f"\nUpdated saved model at epoch {epoch} (previous loss: {self.best_val_loss}, current loss: {logs[Saver.VAL_LOSS]}\n")
+            self.best_val_loss = logs[Saver.VAL_LOSS]
 
 def tokenize(element):
     print("Tokenization of the dataset.")
@@ -135,9 +163,10 @@ tf.keras.mixed_precision.set_global_policy("mixed_float16")
 print("\n Entrainement du modèle en cours ... \n")
 
 # epochs = Nombre d'itérations. Attention à ne pas faire exploser votre machine :D
-#TODO : appeler la fonction fit sur le modele
+#TODO : appeler la fonction fit sur le modele avec les datasets de validation et de train tensoflow,
+# le nombre d'epochs et l'agument callbacks=[saver]
+saver = Saver(model)
 model.#########
-model.fit(tf_train_dataset, validation_data=tf_eval_dataset, epochs=1)
 
 print("Fin de l'entrainement, modèle sauvegardé en local ")
 model.save_pretrained("aurore/model/")
